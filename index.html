@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Flexbox Практикум — 11 балів</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --bg-2: #0e1730;
+      --panel: #121b2c;
+      --panel-2: #182338;
+      --line: #2a3a58;
+      --text: #e8eefc;
+      --muted: #8fa0bf;
+      --mint: #7cffc4;
+      --mint-dim: rgba(124, 255, 196, 0.16);
+      --mint-ink: #062016;
+      --blue: #6ea8ff;
+      --warn: #ffb454;
+      --bad: #ff6b7a;
+      --bad-text: #ffd0d5;
+      --ok: #3ee0a0;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      --header-bg: rgba(11, 18, 32, 0.86);
+      --steps-bg: rgba(18, 27, 44, 0.55);
+      --brief-bg: linear-gradient(180deg, rgba(24, 35, 56, 0.5), transparent);
+      --editor-bg: #0d1526;
+      --editor-text: #d7e4ff;
+      --overlay-bg: rgba(5, 10, 20, 0.72);
+      --code-bg: rgba(124, 255, 196, 0.08);
+      --glow-a: rgba(110, 168, 255, 0.12);
+      --glow-b: rgba(124, 255, 196, 0.08);
+      --logo-bg: linear-gradient(160deg, #1b2d4d, #122033);
+      --tabs-bg: rgba(11, 18, 32, 0.94);
+      --radius: 14px;
+      --mono: "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, monospace;
+      --sans: "Segoe UI", "Ubuntu", "Nunito Sans", system-ui, sans-serif;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f3f6fb;
+      --bg-2: #e8eef8;
+      --panel: #ffffff;
+      --panel-2: #eef3fb;
+      --line: #d5deeb;
+      --text: #12203a;
+      --muted: #5b6c88;
+      --mint: #0f9f70;
+      --mint-dim: rgba(15, 159, 112, 0.12);
+      --mint-ink: #ffffff;
+      --blue: #2563eb;
+      --warn: #c2410c;
+      --bad: #dc2626;
+      --bad-text: #9f1239;
+      --ok: #047857;
+      --shadow: 0 12px 32px rgba(18, 32, 58, 0.12);
+      --header-bg: rgba(255, 255, 255, 0.9);
+      --steps-bg: rgba(238, 243, 251, 0.9);
+      --brief-bg: linear-gradient(180deg, rgba(219, 234, 254, 0.45), transparent);
+      --editor-bg: #f8fafc;
+      --editor-text: #1e293b;
+      --overlay-bg: rgba(15, 23, 42, 0.45);
+      --code-bg: rgba(15, 159, 112, 0.1);
+      --glow-a: rgba(37, 99, 235, 0.1);
+      --glow-b: rgba(15, 159, 112, 0.08);
+      --logo-bg: linear-gradient(160deg, #dbeafe, #ecfdf5);
+      --tabs-bg: rgba(255, 255, 255, 0.94);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, var(--glow-a), transparent 50%),
+        radial-gradient(900px 400px at 100% 0%, var(--glow-b), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100%;
+      min-height: 100dvh;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .app {
+      height: 100%;
+      display: grid;
+      grid-template-rows: 64px 72px 1fr;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .mobile-tabs { display: none; }
+
+    header.app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      padding: 7px;
+      background: var(--logo-bg);
+      border: 1px solid var(--line);
+    }
+
+    .logo-mark span {
+      display: block;
+      border-radius: 2px;
+      background: var(--mint);
+    }
+
+    .logo-mark span:nth-child(2) { opacity: 0.55; }
+    .logo-mark span:nth-child(3) { opacity: 0.35; }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .stat b { color: var(--mint); font-weight: 700; }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: 0;
+    }
+
+    .btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn:hover { border-color: var(--blue); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--mint);
+      color: var(--mint-ink);
+      border: 0;
+    }
+
+      .btn-ghost { background: transparent; }
+
+    .theme-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      flex: 0 0 38px;
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .theme-toggle .icon-sun { display: none; }
+    html[data-theme="light"] .theme-toggle .icon-sun { display: block; }
+    html[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+      background: var(--steps-bg);
+    }
+
+    .step {
+      min-width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .step.current {
+      color: var(--mint-ink);
+      background: var(--mint);
+      border-color: transparent;
+    }
+
+    .step.done {
+      color: var(--mint);
+      border-color: var(--mint);
+      background: var(--mint-dim);
+    }
+
+    .step:disabled { cursor: not-allowed; }
+
+    main {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1.15fr) minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .brief, .editors, .previews {
+      min-height: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .brief {
+      padding: 18px;
+      overflow: auto;
+      background: var(--brief-bg);
+    }
+
+    .kicker {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--blue);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .brief h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    .brief p, .brief li {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .brief p { margin: 0 0 12px; }
+
+    .goal, .theory, .hint-box, .status-box {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+
+    .goal b, .theory b, .hint-box b { color: var(--text); }
+
+    .goal { border-color: rgba(110, 168, 255, 0.35); }
+    .theory { border-color: rgba(255, 180, 84, 0.28); }
+    .hint-box { display: none; border-color: rgba(124, 255, 196, 0.28); }
+    .hint-box.open { display: block; }
+
+    code, .code {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--mint);
+      background: var(--code-bg);
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    .brief-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .status-box { font-size: 13px; }
+    .status-box.ok { border-color: var(--ok); color: var(--ok); }
+    .status-box.bad { border-color: var(--bad); color: var(--bad-text); }
+    .status-box ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); }
+
+    .editors, .previews {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      min-height: 0;
+    }
+
+    .pane {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      resize: none;
+      border: 0;
+      outline: none;
+      background: var(--editor-bg);
+      color: var(--editor-text);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 12px 14px;
+      tab-size: 2;
+    }
+
+    iframe {
+      flex: 1;
+      width: 100%;
+      border: 0;
+      background: #eef2f7;
+    }
+
+    .previews .pane:first-child iframe {
+      box-shadow: inset 0 0 0 2px transparent;
+    }
+
+    .previews .pane.pass iframe {
+      box-shadow: inset 0 0 0 3px rgba(62, 224, 160, 0.85);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--overlay-bg);
+      display: none;
+      place-items: center;
+      z-index: 20;
+      padding: 20px;
+    }
+
+    .overlay.open { display: grid; }
+
+    .card {
+      width: min(560px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 { margin: 0 0 8px; font-size: 28px; }
+    .score-big {
+      font-size: 64px;
+      margin: 10px 0;
+      color: var(--mint);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .grade-list {
+      display: grid;
+      gap: 6px;
+      margin: 16px 0 20px;
+      max-height: 220px;
+      overflow: auto;
+    }
+
+    .grade-list div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 10px;
+      background: var(--bg);
+      border-radius: 8px;
+    }
+
+    .cheatsheet {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .cheatsheet summary {
+      cursor: pointer;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .cheatsheet pre {
+      white-space: pre-wrap;
+      background: var(--editor-bg);
+      padding: 10px;
+      border-radius: 10px;
+      color: var(--editor-text);
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      main { grid-template-columns: 1fr; grid-template-rows: auto minmax(360px, 1fr) minmax(360px, 1fr); }
+      .brief, .editors, .previews { border-right: 0; border-bottom: 1px solid var(--line); }
+      .editors, .previews { min-height: 360px; }
+      .brief { max-height: none; }
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-rows: auto auto 1fr auto;
+        height: 100dvh;
+        min-height: 100dvh;
+      }
+
+      header.app-header {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 12px calc(8px + env(safe-area-inset-top));
+        padding-top: calc(10px + env(safe-area-inset-top));
+      }
+
+      .brand { min-width: 0; flex: 1; }
+      .brand h1 { font-size: 14px; }
+      .brand small { display: none; }
+      .logo-mark { width: 30px; height: 30px; padding: 5px; }
+
+      .header-stats {
+        width: 100%;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .stat {
+        padding: 6px 10px;
+        font-size: 12px;
+        flex: 1;
+        text-align: center;
+      }
+
+      .btn {
+        min-height: 44px;
+        height: 44px;
+        padding: 0 12px;
+        font-size: 14px;
+      }
+
+      .btn-ghost {
+        min-width: 44px;
+        padding: 0 10px;
+      }
+
+      .theme-toggle {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+      }
+
+      .steps {
+        padding: 8px 12px;
+        gap: 6px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .steps::-webkit-scrollbar { display: none; }
+
+      .step {
+        min-width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        border-radius: 10px;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .brief, .editors, .previews {
+        grid-row: 1;
+        grid-column: 1;
+        height: 100%;
+        min-height: 0;
+        border-bottom: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body.view-task .brief,
+      body.view-code .editors,
+      body.view-preview .previews {
+        visibility: visible;
+        pointer-events: auto;
+        z-index: 1;
+      }
+
+      body.view-task .brief {
+        padding: 14px 14px 20px;
+      }
+
+      .brief h2 { font-size: 20px; }
+      .brief p, .brief li { font-size: 15px; }
+
+      .brief-actions {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, transparent, var(--bg) 24%);
+        padding-top: 12px;
+        padding-bottom: 4px;
+      }
+
+      .brief-actions .btn { flex: 1 1 calc(50% - 8px); }
+
+      .editors, .previews {
+        grid-template-rows: minmax(180px, 1fr) minmax(180px, 1fr);
+      }
+
+      .pane-head {
+        padding: 10px 12px;
+        font-size: 11px;
+        gap: 8px;
+      }
+
+      .pane-head span:last-child {
+        display: none;
+      }
+
+      textarea {
+        font-size: 16px;
+        padding: 12px;
+        min-height: 160px;
+      }
+
+      iframe { min-height: 160px; }
+
+      .mobile-tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 6px;
+        padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line);
+        background: var(--tabs-bg);
+        backdrop-filter: blur(12px);
+      }
+
+      .mobile-tabs button {
+        height: 46px;
+        border-radius: 12px;
+        background: var(--panel);
+        color: var(--muted);
+        border: 1px solid var(--line);
+        font-weight: 800;
+        font-size: 13px;
+      }
+
+      body.view-task .mobile-tabs [data-view="task"],
+      body.view-code .mobile-tabs [data-view="code"],
+      body.view-preview .mobile-tabs [data-view="preview"] {
+        background: var(--mint);
+        color: var(--mint-ink);
+        border-color: transparent;
+      }
+
+      .card {
+        padding: 20px 16px;
+        max-height: calc(100dvh - 32px);
+        overflow: auto;
+      }
+
+      .card h2 { font-size: 22px; }
+      .score-big { font-size: 48px; }
+    }
+
+    @media (max-width: 420px) {
+      .brand h1 { font-size: 13px; letter-spacing: 0.02em; }
+      .stat { font-size: 11px; padding: 6px 8px; }
+      .brief-actions .btn { flex-basis: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <div>
+          <h1>FLEXBOX ПРАКТИКУМ</h1>
+          <small>Покроковий тренажер HTML + CSS</small>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat">Прогрес: <b id="progressLabel">1 / 11</b></div>
+        <div class="stat">Оцінка: <b id="scoreLabel">0</b> / 11</div>
+          <button class="theme-toggle" id="themeBtn" type="button" aria-label="Перемкнути тему" title="Тема">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.3A8.5 8.5 0 0 1 9.7 3 7 7 0 1 0 21 14.3z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          </button>
+          <button class="btn btn-ghost" id="resetBtn" type="button">Скинути</button>
+      </div>
+    </header>
+
+    <nav class="steps" id="steps" aria-label="Кроки завдань"></nav>
+
+    <main>
+      <section class="brief">
+        <div class="kicker" id="taskKicker">Завдання 1</div>
+        <h2 id="taskTitle">Структура сторінки</h2>
+        <p id="taskGoalText"></p>
+        <div class="goal" id="taskGoal"></div>
+        <div class="theory" id="taskTheory"></div>
+        <div class="hint-box" id="hintBox"></div>
+        <div class="brief-actions">
+          <button class="btn" id="hintBtn" type="button">Підказка</button>
+          <button class="btn" id="restoreBtn" type="button">Початковий код</button>
+          <button class="btn btn-primary" id="checkBtn" type="button">Перевірити</button>
+          <button class="btn" id="nextBtn" type="button" disabled>Далі</button>
+        </div>
+        <div class="status-box" id="statusBox">Напиши код і натисни «Перевірити». Перевірка також працює автоматично під час введення.</div>
+        <details class="cheatsheet">
+          <summary>Шпаргалка Flexbox</summary>
+          <pre>display: flex;
+flex-direction: row | column;
+justify-content: flex-start | center | flex-end
+                 | space-between | space-around | space-evenly;
+align-items: stretch | flex-start | center | flex-end;
+flex-wrap: nowrap | wrap;
+gap: 20px;
+flex-grow: 1;
+order: -1;
+
+Emmet, Tab:
+.container>.box{1}*3
+header.header>.logo{Logo}+nav.nav>a{Головна}*3
+d:f   jc:c   ai:c   fxd:c   g20   fxg1</pre>
+        </details>
+      </section>
+
+      <section class="editors">
+        <div class="pane">
+          <div class="pane-head"><span>HTML</span><span>Tab — Emmet</span></div>
+          <textarea id="htmlEditor" spellcheck="false" aria-label="Редактор HTML"></textarea>
+        </div>
+        <div class="pane">
+          <div class="pane-head"><span>CSS</span><span>Tab — Emmet</span></div>
+          <textarea id="cssEditor" spellcheck="false" aria-label="Редактор CSS"></textarea>
+        </div>
+      </section>
+
+      <section class="previews">
+        <div class="pane" id="livePane">
+          <div class="pane-head"><span>Твій результат</span><span id="liveTag">наживо</span></div>
+          <iframe id="liveFrame" title="Живий перегляд" sandbox="allow-same-origin"></iframe>
+        </div>
+        <div class="pane">
+          <div class="pane-head"><span>Очікуваний вигляд</span><span>зразок</span></div>
+          <iframe id="goalFrame" title="Очікуваний результат" sandbox="allow-same-origin"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <nav class="mobile-tabs" aria-label="Мобільна навігація">
+      <button type="button" data-view="task">Завдання</button>
+      <button type="button" data-view="code">Код</button>
+      <button type="button" data-view="preview">Результат</button>
+    </nav>
+  </div>
+
+  <div class="overlay" id="finishOverlay">
+    <div class="card">
+      <div class="kicker">Курс завершено</div>
+      <h2 id="finishTitle">Твоя оцінка</h2>
+      <div class="score-big" id="finishScore">11 / 11</div>
+      <p id="finishText" style="color:var(--muted)"></p>
+      <div class="grade-list" id="finishList"></div>
+      <button class="btn btn-primary" id="againBtn" type="button">Пройти ще раз</button>
+    </div>
+  </div>
+
+  <script>
+    const BASE_CSS = `
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: #e8eef6;
+        padding: 14px;
+        color: #0f172a;
+      }
+      .container {
+        background: #fff;
+        border: 2px dashed #b7c4d6;
+        border-radius: 12px;
+        min-height: 150px;
+        padding: 12px;
+      }
+      .box {
+        color: #fff;
+        padding: 14px 18px;
+        border-radius: 10px;
+        font-weight: 800;
+        text-align: center;
+        min-width: 46px;
+      }
+      .box:nth-child(1) { background: #2563eb; }
+      .box:nth-child(2) { background: #7c3aed; }
+      .box:nth-child(3) { background: #db2777; }
+      .box:nth-child(4) { background: #d97706; }
+      .box:nth-child(5) { background: #059669; }
+      .box:nth-child(6) { background: #0891b2; }
+      .header {
+        background: #fff;
+        border: 2px dashed #b7c4d6;
+        border-radius: 12px;
+        padding: 12px 18px;
+      }
+      .logo { font-weight: 800; font-size: 20px; color: #2563eb; }
+      .nav a {
+        color: #334155;
+        text-decoration: none;
+        font-weight: 700;
+        padding: 8px 10px;
+      }
+    `;
+
+    const STORAGE_KEY = "flexbox-practicum-v1";
+    const THEME_KEY = "flexbox-practicum-theme";
+
+    function token(value) {
+      return String(value || "").toLowerCase().replace(/^flex-/, "").trim();
+    }
+
+    function px(value) {
+      return parseFloat(value) || 0;
+    }
+
+    function boxesIn(doc) {
+      const root = doc.querySelector(".container");
+      return root ? [...root.querySelectorAll(":scope > .box")] : [];
+    }
+
+    function styleOf(doc, el) {
+      return doc.defaultView.getComputedStyle(el);
+    }
+
+    const TASKS = [
+      {
+        title: "HTML-структура",
+        intro: "Спочатку потрібна розмітка. Flexbox працює з батьківським контейнером і його прямими дітьми.",
+        goal: "Створи <code>.container</code> і три дочірні <code>.box</code> з текстом <code>1</code>, <code>2</code> і <code>3</code>.",
+        theory: "<b>Теорія.</b> Flex застосовується до батька. Діти стають flex-елементами автоматично.",
+        hint: "Приклад: <code>&lt;div class=\"container\"&gt;&lt;div class=\"box\"&gt;1&lt;/div&gt;...&lt;/div&gt;</code>",
+        html: "<!-- Створи контейнер і три бокси -->\n",
+        css: "/* CSS знадобиться з наступного кроку */\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: "",
+        check(doc) {
+          const errors = [];
+          const root = doc.querySelector(".container");
+          if (!root) errors.push("Немає елемента з класом container.");
+          const items = boxesIn(doc);
+          if (items.length < 3) errors.push("Усередині .container має бути щонайменше 3 елементи .box.");
+          const texts = items.map((el) => el.textContent.trim());
+          ["1", "2", "3"].forEach((t) => {
+            if (!texts.includes(t)) errors.push("Бокси мають містити текст 1, 2 і 3.");
+          });
+          return errors;
+        }
+      },
+      {
+        title: "Увімкни Flexbox",
+        intro: "Без display: flex блоки йдуть один під одним. Зроби контейнер гнучким.",
+        goal: "Для <code>.container</code> задай <code>display: flex</code>. Три бокси мають стати в рядок.",
+        theory: "<b>Теорія.</b> <code>display: flex</code> вмикає головну вісь (ряд) і поперечну вісь (висота рядка).",
+        hint: ".container { display: flex; }",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  \n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n}",
+        check(doc) {
+          const errors = [];
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          if (boxesIn(doc).length < 3) errors.push("Залиш три .box всередині контейнера.");
+          if (token(styleOf(doc, root).display) !== "flex") errors.push("У .container має бути display: flex.");
+          return errors;
+        }
+      },
+      {
+        title: "Центр по головній осі",
+        intro: "justify-content керує розташуванням елементів уздовж головного напрямку.",
+        goal: "Додай <code>justify-content: center</code>, щоб бокси зібрались по центру рядка.",
+        theory: "<b>Теорія.</b> Головна вісь за замовчуванням — горизонталь. center ставить групу елементів посередині.",
+        hint: "Разом із display: flex додай justify-content: center;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  justify-content: center;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.justifyContent) !== "center") errors.push("Потрібен justify-content: center.");
+          return errors;
+        }
+      },
+      {
+        title: "Центр по поперечній осі",
+        intro: "align-items вирівнює елементи впоперек осі. Щоб ефект був видно, контейнеру потрібна висота.",
+        goal: "Задай <code>height: 220px</code> і <code>align-items: center</code>.",
+        theory: "<b>Теорія.</b> stretch — значення за замовчуванням. center ставить дітей посередині висоти батька.",
+        hint: "height: 220px; align-items: center;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  justify-content: center;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 220px;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.alignItems) !== "center") errors.push("Потрібен align-items: center.");
+          if (px(s.height) < 200) errors.push("Висота .container має бути 220px.");
+          return errors;
+        }
+      },
+      {
+        title: "Колонка",
+        intro: "flex-direction змінює головну вісь. column ставить елементи вертикально.",
+        goal: "Встанови <code>flex-direction: column</code> і залиш центрування.",
+        theory: "<b>Теорія.</b> Після column головна вісь стає вертикальною, тож justify-content уже рухає елементи вгору-вниз.",
+        hint: "flex-direction: column;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 220px;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 220px;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.flexDirection) !== "column") errors.push("Потрібен flex-direction: column.");
+          if (token(s.alignItems) !== "center") errors.push("Залиш align-items: center.");
+          return errors;
+        }
+      },
+      {
+        title: "Відступи gap",
+        intro: "gap задає однакову відстань між flex-елементами без margin-хаків.",
+        goal: "Поверни рядок: <code>flex-direction: row</code> і додай <code>gap: 20px</code>.",
+        theory: "<b>Теорія.</b> gap працює і в ряд, і в колонку. Це найчистіший спосіб розвести елементи.",
+        hint: "flex-direction: row; gap: 20px;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  flex-direction: column;\n  justify-content: center;\n  align-items: center;\n  height: 220px;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  flex-direction: row;\n  justify-content: center;\n  align-items: center;\n  gap: 20px;\n  height: 220px;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.flexDirection) !== "row") errors.push("Потрібен flex-direction: row.");
+          const gap = s.gap || s.columnGap;
+          if (Math.abs(px(gap) - 20) > 0.5) errors.push("Потрібен gap: 20px.");
+          return errors;
+        }
+      },
+      {
+        title: "space-between",
+        intro: "space-between притискає перший елемент до початку, останній — до кінця, решту розподіляє між ними.",
+        goal: "Постав <code>justify-content: space-between</code>. Контейнер має займати всю ширину.",
+        theory: "<b>Теорія.</b> Це класичний прийом для шапки: логотип зліва, дії справа.",
+        hint: "justify-content: space-between;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  height: 120px;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  height: 120px;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.justifyContent) !== "space-between") errors.push("Потрібен justify-content: space-between.");
+          return errors;
+        }
+      },
+      {
+        title: "Перенесення рядка",
+        intro: "Якщо елементів більше, ніж вміщує ширина, flex-wrap: wrap переносить їх на наступний рядок.",
+        goal: "Зроби 6 боксів (1–6), постав <code>width: 250px</code> і <code>flex-wrap: wrap</code>, <code>gap: 10px</code>.",
+        theory: "<b>Теорія.</b> За замовчуванням nowrap стискає елементи. wrap зберігає їхній розмір і переносить.",
+        hint: "Шість .box у HTML. У CSS: width: 250px; flex-wrap: wrap; gap: 10px;",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n  <div class=\"box\">4</div>\n  <div class=\"box\">5</div>\n  <div class=\"box\">6</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 10px;\n  width: 250px;\n}",
+        check(doc) {
+          const root = doc.querySelector(".container");
+          if (!root) return ["Немає .container."];
+          const items = boxesIn(doc);
+          const s = styleOf(doc, root);
+          const errors = [];
+          if (items.length < 6) errors.push("Потрібно 6 елементів .box з текстом 1–6.");
+          if (token(s.display) !== "flex") errors.push("Потрібен display: flex.");
+          if (token(s.flexWrap) !== "wrap") errors.push("Потрібен flex-wrap: wrap.");
+          if (px(s.width) > 270 || px(s.width) < 200) errors.push("Ширина .container має бути 250px.");
+          const gap = s.gap || s.rowGap;
+          if (Math.abs(px(gap) - 10) > 0.5) errors.push("Потрібен gap: 10px.");
+          return errors;
+        }
+      },
+      {
+        title: "flex-grow",
+        intro: "flex-grow каже елементу забрати вільний простір. 0 — не рости, 1 — забрати доступне місце.",
+        goal: "Залиш 3 бокси. Другий має рости: <code>.box:nth-child(2) { flex-grow: 1; }</code>",
+        theory: "<b>Теорія.</b> Якщо кілька елементів мають grow, вільний простір ділиться пропорційно до числа.",
+        hint: ".container { display: flex; gap: 10px; }\n.box:nth-child(2) { flex-grow: 1; }",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  gap: 10px;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  gap: 10px;\n}\n.box:nth-child(2) {\n  flex-grow: 1;\n}",
+        check(doc) {
+          const items = boxesIn(doc);
+          if (items.length < 3) return ["Потрібно 3 елементи .box."];
+          const root = doc.querySelector(".container");
+          if (token(styleOf(doc, root).display) !== "flex") return ["Потрібен display: flex на .container."];
+          const grow = parseFloat(styleOf(doc, items[1]).flexGrow);
+          if (!(grow >= 1)) return ["Другий .box має мати flex-grow: 1."];
+          const w1 = items[0].getBoundingClientRect().width;
+          const w2 = items[1].getBoundingClientRect().width;
+          if (w2 <= w1 + 8) return ["Другий бокс має стати ширшим за сусідів."];
+          return [];
+        }
+      },
+      {
+        title: "order",
+        intro: "order змінює візуальний порядок без перестановки HTML. Менше значення — раніше на осі.",
+        goal: "Зроби так, щоб бокс <code>3</code> став першим зліва через <code>order: -1</code>.",
+        theory: "<b>Теорія.</b> Початковий order у всіх 0. Від’ємне значення виводить елемент на початок.",
+        hint: ".box:nth-child(3) { order: -1; }",
+        html: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        css: ".container {\n  display: flex;\n  gap: 10px;\n}\n",
+        solutionHtml: "<div class=\"container\">\n  <div class=\"box\">1</div>\n  <div class=\"box\">2</div>\n  <div class=\"box\">3</div>\n</div>",
+        solutionCss: ".container {\n  display: flex;\n  gap: 10px;\n}\n.box:nth-child(3) {\n  order: -1;\n}",
+        check(doc) {
+          const items = boxesIn(doc);
+          if (items.length < 3) return ["Потрібно 3 елементи .box."];
+          const root = doc.querySelector(".container");
+          if (token(styleOf(doc, root).display) !== "flex") return ["Потрібен display: flex."];
+          const third = items[2];
+          if (parseInt(styleOf(doc, third).order, 10) >= 0) return ["Третій .box має мати order: -1."];
+          const visual = [...items].sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+          if (!visual[0].textContent.includes("3")) return ["Бокс 3 має бути найлівішим."];
+          return [];
+        }
+      },
+      {
+        title: "Макет шапки",
+        intro: "Фінал: збери типову шапку сайту. Логотип зліва, навігація справа, пункти меню в ряд.",
+        goal: "Зроби <code>.header</code> з <code>.logo</code> і <code>.nav</code> (три посилання). Header: flex, space-between, align-items center. Nav теж flex з gap 16px.",
+        theory: "<b>Теорія.</b> У вкладених flex-контейнерах кожен рівень керує лише своїми дітьми.",
+        hint: ".header { display:flex; justify-content:space-between; align-items:center; }\n.nav { display:flex; gap:16px; }",
+        html: "<!-- header.logo + nav з трьома посиланнями -->\n",
+        css: "/* Збери шапку */\n",
+        solutionHtml: "<header class=\"header\">\n  <div class=\"logo\">Logo</div>\n  <nav class=\"nav\">\n    <a href=\"#\">Головна</a>\n    <a href=\"#\">Про нас</a>\n    <a href=\"#\">Контакти</a>\n  </nav>\n</header>",
+        solutionCss: ".header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n}\n.nav {\n  display: flex;\n  gap: 16px;\n}",
+        check(doc) {
+          const errors = [];
+          const header = doc.querySelector(".header");
+          const logo = doc.querySelector(".logo");
+          const nav = doc.querySelector(".nav");
+          if (!header) errors.push("Немає .header.");
+          if (!logo) errors.push("Немає .logo.");
+          if (!nav) errors.push("Немає .nav.");
+          if (errors.length) return errors;
+          const hs = styleOf(doc, header);
+          const ns = styleOf(doc, nav);
+          if (token(hs.display) !== "flex") errors.push(".header має бути display: flex.");
+          if (token(hs.justifyContent) !== "space-between") errors.push(".header: justify-content: space-between.");
+          if (token(hs.alignItems) !== "center") errors.push(".header: align-items: center.");
+          if (token(ns.display) !== "flex") errors.push(".nav має бути display: flex.");
+          const gap = ns.gap || ns.columnGap;
+          if (Math.abs(px(gap) - 16) > 0.5) errors.push(".nav має мати gap: 16px.");
+          if (nav.querySelectorAll("a").length < 3) errors.push("У .nav має бути щонайменше 3 посилання.");
+          return errors;
+        }
+      }
+    ];
+
+    const htmlEditor = document.getElementById("htmlEditor");
+    const cssEditor = document.getElementById("cssEditor");
+    const liveFrame = document.getElementById("liveFrame");
+    const goalFrame = document.getElementById("goalFrame");
+    const livePane = document.getElementById("livePane");
+    const statusBox = document.getElementById("statusBox");
+    const nextBtn = document.getElementById("nextBtn");
+    const hintBox = document.getElementById("hintBox");
+
+    let current = 0;
+    let completed = Array(TASKS.length).fill(false);
+    let drafts = TASKS.map((task) => ({ html: task.html, css: task.css }));
+    let debounceId = 0;
+    let liveReady = false;
+
+    function sanitize(html) {
+      return String(html || "")
+        .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+        .replace(/\son\w+\s*=/gi, " ");
+    }
+
+    function srcdoc(html, css) {
+      return "<!DOCTYPE html><html><head><meta charset='utf-8'><style>" +
+        BASE_CSS + "\n" + css + "</style></head><body>" + sanitize(html) + "</body></html>";
+    }
+
+    function save() {
+      drafts[current] = { html: htmlEditor.value, css: cssEditor.value };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ current, completed, drafts }));
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (Array.isArray(data.completed)) completed = data.completed;
+        if (Array.isArray(data.drafts) && data.drafts.length === TASKS.length) drafts = data.drafts;
+        if (Number.isInteger(data.current)) current = Math.min(data.current, TASKS.length - 1);
+      } catch (e) {}
+    }
+
+    function score() {
+      return completed.filter(Boolean).length;
+    }
+
+    function canOpen(index) {
+      if (index === 0) return true;
+      return completed[index] || completed[index - 1] || index <= current;
+    }
+
+    function renderSteps() {
+      const nav = document.getElementById("steps");
+      nav.innerHTML = "";
+      TASKS.forEach((task, index) => {
+        const btn = document.createElement("button");
+        btn.className = "step";
+        btn.type = "button";
+        btn.textContent = String(index + 1);
+        if (completed[index]) btn.classList.add("done");
+        if (index === current) btn.classList.add("current");
+        btn.disabled = !(completed[index] || index === current || (index > 0 && completed[index - 1]));
+        btn.title = "Завдання " + (index + 1) + ": " + task.title;
+        btn.addEventListener("click", () => goTo(index));
+        nav.appendChild(btn);
+      });
+      document.getElementById("progressLabel").textContent = (current + 1) + " / 11";
+      document.getElementById("scoreLabel").textContent = String(score());
+    }
+
+    function fillTask() {
+      const task = TASKS[current];
+      document.getElementById("taskKicker").textContent = "Завдання " + (current + 1) + " з 11";
+      document.getElementById("taskTitle").textContent = task.title;
+      document.getElementById("taskGoalText").textContent = task.intro;
+      document.getElementById("taskGoal").innerHTML = "<b>Зроби.</b> " + task.goal;
+      document.getElementById("taskTheory").innerHTML = task.theory;
+      hintBox.classList.remove("open");
+      hintBox.innerHTML = "<b>Підказка.</b> " + task.hint;
+      htmlEditor.value = drafts[current].html;
+      cssEditor.value = drafts[current].css;
+      nextBtn.disabled = !completed[current];
+      nextBtn.textContent = current === TASKS.length - 1 ? "Завершити" : "Далі";
+      goalFrame.srcdoc = srcdoc(task.solutionHtml, task.solutionCss);
+      updateLive();
+      renderSteps();
+    }
+
+    function updateLive() {
+      liveReady = false;
+      liveFrame.srcdoc = srcdoc(htmlEditor.value, cssEditor.value);
+    }
+
+    function setStatus(ok, errors) {
+      livePane.classList.toggle("pass", ok);
+      statusBox.className = "status-box " + (ok ? "ok" : "bad");
+      if (ok) {
+        statusBox.textContent = "Правильно. Завдання " + (current + 1) + " зараховано. +" + (completed[current] ? "0" : "1") + " бал.";
+        if (!completed[current]) {
+          completed[current] = true;
+          statusBox.textContent = "Правильно. Завдання " + (current + 1) + " зараховано. +1 бал.";
+        }
+        nextBtn.disabled = false;
+        renderSteps();
+        save();
+        return;
+      }
+      const unique = [...new Set(errors)];
+      statusBox.innerHTML = "Ще не виконано.<ul>" + unique.map((e) => "<li>" + e + "</li>").join("") + "</ul>";
+    }
+
+    function runCheck() {
+      const doc = liveFrame.contentDocument;
+      if (!doc || !liveReady) {
+        statusBox.className = "status-box";
+        statusBox.textContent = "Оновлюю перегляд...";
+        return;
+      }
+      const errors = TASKS[current].check(doc);
+      setStatus(errors.length === 0, errors);
+    }
+
+    function setMobileView(view) {
+      document.body.classList.remove("view-task", "view-code", "view-preview");
+      document.body.classList.add("view-" + view);
+    }
+
+    function goTo(index) {
+      drafts[current] = { html: htmlEditor.value, css: cssEditor.value };
+      current = index;
+      fillTask();
+      save();
+      setMobileView("task");
+    }
+
+    function finish() {
+      const total = score();
+      document.getElementById("finishScore").textContent = total + " / 11";
+      const title = document.getElementById("finishTitle");
+      const text = document.getElementById("finishText");
+      if (total === 11) {
+        title.textContent = "Відмінно";
+        text.textContent = "Усі 11 кроків Flexbox виконано. Оцінка: 11 балів.";
+      } else if (total >= 9) {
+        title.textContent = "Дуже добре";
+        text.textContent = "Майже повний комплект навичок. Повернись до незарахованих кроків.";
+      } else if (total >= 7) {
+        title.textContent = "Добре";
+        text.textContent = "База є. Пройди ще раз кроки, які підсвічені не м’ятним кольором.";
+      } else {
+        title.textContent = "Потрібна практика";
+        text.textContent = "Пройди завдання знову. Дивись на зразок справа і шпаргалку.";
+      }
+      document.getElementById("finishList").innerHTML = TASKS.map((task, index) => {
+        return "<div><span>" + (index + 1) + ". " + task.title + "</span><b>" + (completed[index] ? "1 бал" : "0 балів") + "</b></div>";
+      }).join("");
+      document.getElementById("finishOverlay").classList.add("open");
+    }
+
+    let emmetExpand = null;
+    let emmetExtract = null;
+
+    import("https://cdn.jsdelivr.net/npm/emmet@2.4.11/dist/emmet.es.js")
+      .then((mod) => {
+        emmetExpand = mod.default;
+        emmetExtract = mod.extract;
+      })
+      .catch(() => {});
+
+    function insertAtCaret(editor, start, end, text) {
+      editor.value = editor.value.slice(0, start) + text + editor.value.slice(end);
+      editor.selectionStart = editor.selectionEnd = start + text.length;
+      editor.dispatchEvent(new Event("input"));
+    }
+
+    function enableEmmet(editor, syntax) {
+      editor.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab" || event.shiftKey) return;
+        const caret = editor.selectionStart;
+        if (caret !== editor.selectionEnd) return;
+
+        const value = editor.value;
+        const type = syntax === "css" ? "stylesheet" : "markup";
+        event.preventDefault();
+
+        if (!emmetExpand || !emmetExtract) {
+          insertAtCaret(editor, caret, caret, "  ");
+          return;
+        }
+
+        const lineStart = value.lastIndexOf("\n", caret - 1) + 1;
+        let lineEnd = value.indexOf("\n", caret);
+        if (lineEnd === -1) lineEnd = value.length;
+        const line = value.slice(lineStart, lineEnd);
+        const found = emmetExtract(line, caret - lineStart, { type: type, lookAhead: true });
+        if (!found || !found.abbreviation) {
+          insertAtCaret(editor, caret, caret, "  ");
+          return;
+        }
+
+        try {
+          const indent = value.slice(lineStart, lineStart + found.start).match(/^\s*/)[0] || "";
+          const expanded = emmetExpand(found.abbreviation, {
+            syntax: syntax === "css" ? "css" : "html",
+            type: type,
+            options: {
+              "output.indent": "  ",
+              "output.baseIndent": indent,
+              "output.newline": "\n",
+              "output.field": function () { return ""; }
+            }
+          });
+          if (!expanded) {
+            insertAtCaret(editor, caret, caret, "  ");
+            return;
+          }
+          insertAtCaret(editor, lineStart + found.start, lineStart + found.end, expanded);
+        } catch (err) {
+          insertAtCaret(editor, caret, caret, "  ");
+        }
+      });
+    }
+
+    htmlEditor.addEventListener("input", () => {
+      save();
+      clearTimeout(debounceId);
+      debounceId = setTimeout(updateLive, 180);
+    });
+    cssEditor.addEventListener("input", () => {
+      save();
+      clearTimeout(debounceId);
+      debounceId = setTimeout(updateLive, 120);
+    });
+    enableEmmet(htmlEditor, "html");
+    enableEmmet(cssEditor, "css");
+
+    liveFrame.addEventListener("load", () => {
+      liveReady = true;
+      runCheck();
+    });
+
+    document.querySelectorAll(".mobile-tabs button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setMobileView(btn.dataset.view);
+        if (btn.dataset.view === "preview") updateLive();
+      });
+    });
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      runCheck();
+      if (window.matchMedia("(max-width: 760px)").matches) setMobileView("preview");
+    });
+    document.getElementById("hintBtn").addEventListener("click", () => hintBox.classList.toggle("open"));
+    document.getElementById("restoreBtn").addEventListener("click", () => {
+      drafts[current] = { html: TASKS[current].html, css: TASKS[current].css };
+      fillTask();
+    });
+    nextBtn.addEventListener("click", () => {
+      if (!completed[current]) return;
+      if (current === TASKS.length - 1) {
+        finish();
+        return;
+      }
+      goTo(current + 1);
+    });
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("Скинути весь прогрес і код?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      current = 0;
+      completed = Array(TASKS.length).fill(false);
+      drafts = TASKS.map((task) => ({ html: task.html, css: task.css }));
+      document.getElementById("finishOverlay").classList.remove("open");
+      fillTask();
+    });
+    document.getElementById("againBtn").addEventListener("click", () => {
+      document.getElementById("finishOverlay").classList.remove("open");
+      document.getElementById("resetBtn").click();
+    });
+    document.addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        runCheck();
+      }
+    });
+
+    function applyTheme(theme) {
+      const next = theme === "light" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem(THEME_KEY, next);
+      const btn = document.getElementById("themeBtn");
+      if (btn) btn.setAttribute("aria-label", next === "light" ? "Увімкнути темну тему" : "Увімкнути світлу тему");
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY);
+      if (saved === "light" || saved === "dark") {
+        applyTheme(saved);
+        return;
+      }
+      applyTheme(window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+    }
+
+    document.getElementById("themeBtn").addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      applyTheme(currentTheme === "light" ? "dark" : "light");
+    });
+
+    initTheme();
+    load();
+    fillTask();
+    setMobileView("task");
+  </script>
+</body>
+</html>
